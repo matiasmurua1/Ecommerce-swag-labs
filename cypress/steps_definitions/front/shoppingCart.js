@@ -44,3 +44,17 @@ Then("elimino el producto {string} del carrito de compras", (productName) => {
 Then("el producto {string} deberia ser eliminado del carrito de compras exitosamente", (productName) => {
     yourCartPage.getInventoryItemName().should('not.exist');
 });
+
+When("agrego los productos {string}, {string} y {string} al carrito de compras", (productName1, productName2, productName3) => {
+
+    homePage.getInventoryItemName().should('contain', productName1);
+    homePage.clickAddToCart();
+    cy.wait(1000);
+    homePage.getInventoryItemName().should('contain', productName2);
+    homePage.clickAddToCart();
+    cy.wait(1000);
+    homePage.getInventoryItemName().should('contain', productName3);
+    cy.wait(1000);
+    homePage.clickAddToCart();
+    
+});
