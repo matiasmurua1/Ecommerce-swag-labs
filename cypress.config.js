@@ -2,7 +2,6 @@ const { defineConfig } = require('cypress');
 const { addCucumberPreprocessorPlugin } = require('@badeball/cypress-cucumber-preprocessor');
 const createEsbuildPlugin = require('@badeball/cypress-cucumber-preprocessor/esbuild').createEsbuildPlugin;
 const createBundler = require('@bahmutov/cypress-esbuild-preprocessor');
-
 module.exports = defineConfig({
   e2e: {
     specPattern: "cypress/features/**/*.feature",
