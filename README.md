@@ -1,108 +1,154 @@
-# FRAMEWORK DE AUTOMATIZACIÓN - SWAG LABS
+# Introducción
 
-## ¿QUÉ ES?
+# Swag Labs - Automatización E2E
+Proyecto de automatización End-to-End del módulo de compras (Login y Shopping Cart) utilizando Cypress.
+Se implementa Page Object Model y estructura BDD con Cucumber.
 
-Framework BDD para pruebas End-to-End web y API usando Cypress y Cucumber.
-Implementa Page Object Model con generación de reportes HTML.
+# Índice
 
-## REQUISITOS
+- [Cómo Comenzar](#cómo-comenzar)
+- [Prerrequisitos](#prerrequisitos)
+- [Instalación de dependencias](#instalación-de-dependencias)
+- [Ejecución de tests](#ejecución-de-tests)
+- [Scripts relevantes del `package.json`](#scripts-relevantes-del-packagejson)
+- [Plugins recomendados](#plugins-recomendados)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Spec pattern y preprocesador](#spec-pattern-y-preprocesador)
+- [Características](#características)
+- [Recursos útiles](#recursos-útiles)
+- [Decisiones técnicas](#decisiones-técnicas)
 
-- Node.js 16+
-- npm 8+
+# Cómo Comenzar
+
+## Prerrequisitos
+
+- Node.js v18+
+- npm v9+
 - Chrome instalado
 - Visual Studio Code (opcional)
 
-## INSTALACIÓN RÁPIDA
+## Instalación de dependencias
+
+Clona el repositorio y desde la raíz del proyecto ejecuta:
 
 ```bash
-git clone https://github.com/matiasmurua1/swag-labs-challenge.git
-cd swag-labs-challenge
 npm install
 ```
 
-## COMANDOS PRINCIPALES
+Esto instalará `cypress`, el preprocesador de Cucumber, herramientas de reporte y demás dependencias listadas en `package.json`.
+
+## Ejecución de tests
+
+Comandos principales disponibles (definidos en `package.json`):
 
 ```bash
-npm run test              # Ejecutar pruebas en modo headless
-npm run test:open        # Abrir interfaz interactiva de Cypress
-npm run test:report      # Ejecutar pruebas y generar reporte HTML
+npm run test         # ejecuta cypress en modo headless (cypress run)
+npm run test:open    # abre la UI de Cypress (cypress open)
+npm run test:report  # ejecuta pruebas y genera reporte HTML
 ```
 
-## ESTRUCTURA DETALLADA DEL PROYECTO
+### Scripts relevantes del `package.json`
+
+- `test`: ejecuta `cypress run` en modo headless.
+- `test:open`: ejecuta `cypress open` para interfaz interactiva.
+- `test:report`: ejecuta pruebas y genera un reporte HTML automático con Cucumber Reporter.
+
+## Plugins recomendados
+
+- Cucumber (Gherkin) Full Support: `alexkrechik.cucumberautocomplete`
+- Cypress Helper / Snippets: `shelex.vscode-cy-helper`, `andrew-codes.cypress-snippets`
+- ESLint: `dbaeumer.vscode-eslint`
+- Prettier: `esbenp.prettier-vscode`
+- GitLens: `eamodio.gitlens`
+
+## Estructura del proyecto
+
+Carpetas principales relevantes:
+
+- `cypress/features/`: archivos `.feature` en Gherkin (tests en formato BDD).
+  - `front/`: pruebas de interfaz de usuario (login, carrito de compras).
+- `cypress/steps_definitions/`: definiciones de pasos (JS) mapeados al Gherkin.
+  - `front/`: implementación de steps para UI.
+- `cypress/pages/`: page objects (locators y helpers de UI).
+- `cypress/support/`: comandos personalizados y configuración compartida.
+- `jsonlogs/`: logs generados automáticamente en formato JSON y NDJSON.
+- `cypress.config.js`: configuración principal de Cypress.
+
+Estructura completa:
 
 ```
-swag-labs-challenge/
-├── cypress/                              Directorio principal de Cypress
-│   ├── features/                         Casos de prueba en formato Gherkin
-│   │   ├── api/
-│   │   │   └── mercadoLibre.feature    Pruebas de API MercadoLibre
-│   │   └── front/                      Pruebas de interfaz de usuario
-│   │       ├── login.feature           Casos de prueba de login
-│   │       └── shoppingCart.feature    Casos de compra y carrito
-│   ├── pages/                           Page Object Model - Encapsulación de elementos
-│   │   ├── homePage.js                 Elementos y acciones de página principal
-│   │   ├── loginPage.js                Elementos y acciones de login
-│   │   ├── yourCartPage.js             Elementos y acciones del carrito
-│   │   ├── yourInformationPage.js      Elementos y acciones de información personal
-│   │   └── checkoutOverviewPage.js     Elementos y acciones de resumen de compra
-│   ├── steps_definitions/               Definición de pasos Gherkin a código
-│   │   ├── api/
-│   │   │   └── mercadoLibre.js         Implementación de pasos API
-│   │   └── front/
-│   │       ├── common.js               Pasos comunes compartidos
-│   │       └── shoppingCart.js         Pasos de compra y carrito
-│   ├── services/                        Servicios para llamadas a APIs externas
-│   │   └── mercadoLibreApi.js          Cliente HTTP para MercadoLibre API
-│   ├── support/                         Configuración y utilidades globales
-│   │   ├── commands.js                 Comandos personalizados de Cypress
-│   │   └── e2e.js                      Configuración inicial para pruebas
-│   ├── reports/                         Reportes generados automáticamente
-│   │   └── json/
-│   │       └── cucumber_report.json    Reporte en formato JSON
-│   └── screenshots/                     Screenshots de fallos generados automáticamente
+ecommerce-swag-labs/
+├── cypress/
+│   ├── features/                         Casos de prueba en Gherkin
+│   │   ├── front/
+│   │   ├── login.feature            Escenarios de autenticación
+│   │   └── shoppingCart.feature     Escenarios de carrito y compra
+│   │   
+│   ├── pages/                            Page Object Model
+│   │   ├── loginPage.js                 Elementos y acciones de login
+│   │   ├── homePage.js                  Elementos y acciones de página principal
+│   │   ├── yourCartPage.js              Elementos y acciones del carrito
+│   │   ├── yourInformationPage.js       Elementos y acciones de información de usuario
+│   │   └── checkoutOverviewPage.js      Elementos y acciones del resumen de compra
+│   ├── steps_definitions/                Implementación de pasos del BDD
+│   │   ├── front/
+│   │   ├── common.js                Pasos comunes reutilizables
+│   │   └── shoppingCart.js          Pasos de flujo de compra
+│   │   
+│   │
+│   ├── support/                          Configuración y utilidades globales
+│   │   ├── commands.js                  Comandos personalizados de Cypress
+│   │   └── e2e.js                       Configuración inicial de pruebas
+│   ├── plugins/                          Plugins y generadores de reportes
+│   │   └── generateReport.js            Generador de reportes HTML
+│   └── screenshots/                      Screenshots capturados automáticamente
 │       └── front/
-│           └── login.feature/
-├── jsonlogs/                            Logs del sistema
-│   ├── log.json                         Log en formato JSON
-│   └── messages.ndjson                 Log en formato NDJSON
-├── node_modules/                        Dependencias instaladas (ignorar en Git)
-├── .vscode/                             Configuración de Visual Studio Code
-├── cypress.config.js                    Configuración principal de Cypress
-├── package.json                         Dependencias y scripts del proyecto
-├── package-lock.json                    Lock de dependencias (ignorar en Git)
-├── .gitignore                           Archivo de exclusiones para Git
+├── jsonlogs/                             Logs automáticos
+│   ├── log.json                          Log en formato JSON
+│   └── messages.ndjson                  Log en formato NDJSON
+├── node_modules/                         Dependencias (ignorar en Git)
+├── cypress.config.js                     Configuración de Cypress
 ├── .cypress-cucumber-preprocessorrc.json Configuración del preprocessor
-├── cucumber-report.html                 Reporte HTML principal generado
-└── README.md                            Explicación proyecto
+├── cucumber-report.html                  Reporte HTML generado
+├── package.json                          Dependencias y scripts
+├── package-lock.json                     Lock de versiones
+├── .gitignore                            Exclusiones de Git
+└── README.md                             Documentación del proyecto
 ```
 
-## CARACTERÍSTICAS
+## Spec pattern y preprocesador
 
-- Pruebas BDD con Cucumber Preprocessor
-- Patrón Page Object Model
-- Reportes HTML automáticos
-- Pruebas API integradas
-- Screenshots en fallos
-- Validación de código con ESLint
+La configuración de Cypress utiliza:
 
-## TECNOLOGÍAS
+- **specPattern**: `cypress/features/**/*.feature` para archivos Gherkin.
+- **Preprocesador**: `@badeball/cypress-cucumber-preprocessor` con `esbuild` para compilar features a código ejecutable.
+- **Archivo de configuración**: `cypress.config.js`.
 
-Cypress, Cucumber, Node.js, ESLint, Multiple Cucumber HTML Reporter
+## Características
 
-## MEJORES PRÁCTICAS ISTQB
+- **Pruebas BDD con Cucumber**: Escenarios legibles en Gherkin (Given/When/Then).
+- **Page Object Model**: Encapsulación de elementos y acciones de UI.
+- **Reportes HTML automáticos**: Generación de reportes visuales con Cucumber Reporter.
+- **Screenshots en fallos**: Captura automática de pantallas en errores.
+- **Logs estructurados**: Generación de logs JSON para auditoría y debugging.
+- **Validación de código**: ESLint para mantener code quality.
 
-- Estructura Given, When, Then (AAA)
-- Escenarios independientes
-- Nombres descriptivos y claros
-- Pruebas de UI y API separadas
+# Recursos útiles
 
-## GENERAR REPORTE
+- Cypress: https://docs.cypress.io
+- Cucumber / Gherkin: https://cucumber.io/docs/gherkin/reference/
+- Cypress Cucumber Preprocessor: https://github.com/badeball/cypress-cucumber-preprocessor
+- Multiple Cucumber HTML Reporter: https://github.com/volumes/multiple-cucumber-html-reporter
 
-```bash
-npm run test:report
-```
-El reporte HTML se genera en `cucumber-report.html`
+# Decisiones técnicas
+
+- **Uso de POM (Page Object Model)**: Facilita el mantenimiento del código y reutilización de locators.
+- **Ejemplos en features**: Uso de `Examples` para parametrizar escenarios y validar múltiples usuarios en un mismo flujo.
+- **Parametrización de steps**: Steps reutilizables y genéricos para facilitar composición de escenarios complejos.
+- **Logs y Reportes**: Generación automática de logs y reportes para trazabilidad y análisis de fallos.
 
 AUTOR: MURUA MARTINEZ MATIAS NAHUEL  
 Email: murua.matias.96@gmail.com  
-Versión: 1.0.0 - Febrero 2026
+Versión: 1.0.0 - Mayo 2026
+
+

@@ -44,3 +44,33 @@ Then("elimino el producto {string} del carrito de compras", (productName) => {
 Then("el producto {string} deberia ser eliminado del carrito de compras exitosamente", (productName) => {
     yourCartPage.getInventoryItemName().should('not.exist');
 });
+
+When("agrego los productos {string}, {string} y {string} al carrito de compras", (productName1, productName2, productName3) => {
+
+    homePage.getInventoryItemName().should('contain', productName1);
+    homePage.getInventoryItemName().should('contain', productName2);
+    homePage.getInventoryItemName().should('contain', productName3);
+    homePage.clickAddToCartMultipleProducts();
+    
+});
+
+Then("los productos {string}, {string} y {string} deberian ser agregados al carrito de compras exitosamente", (productName1, productName2, productName3) => {
+    yourCartPage.clickButtonCart();
+    yourCartPage.getInventoryItemName().should('contain', productName1);
+    yourCartPage.getInventoryItemName().should('contain', productName2);
+    yourCartPage.getInventoryItemName().should('contain', productName3);
+});
+
+Then("la compra de los productos {string}, {string} y {string} deberia ser realizada exitosamente", (productName1, productName2, productName3) => {
+    checkoutOverviewPageInstance.getTitleInformation().should('contain', 'Checkout: Overview');
+    checkoutOverviewPageInstance.getInventoryItemName().should('contain', productName1);
+    checkoutOverviewPageInstance.getInventoryItemName().should('contain', productName2);
+    checkoutOverviewPageInstance.getInventoryItemName().should('contain', productName3);
+    checkoutOverviewPageInstance.clickButtonFinish();
+    checkoutOverviewPageInstance.getMessageOrderSuccess().should('contain', 'Thank you for your order!');
+});
+
+When("intento realizar checkout con campos obligatorios vacios", () => {
+    yourCartPage.clickButtonCheckout();
+    yourInformationPage.clickContinueButton();
+});
