@@ -5,7 +5,7 @@ const loginPage = new LoginPage();
 const homePage = new HomePage();
 
 Given("que estoy en la pagina de login de Swag Labs", () => {
-    cy.visit("https://www.saucedemo.com/");
+    cy.visit("/");
     loginPage.getLoginLogo().should("be.visible");
 
 });
@@ -21,4 +21,4 @@ Then("deberia iniciar sesion exitosamente y ser redirigido a la pagina de inicio
 
 Then("verifico que se muestre el mensaje de error {string}", (errorMessage) => {
     loginPage.getBlockedUserErrorMessage().should("contain.text", errorMessage);
-}); 
+});

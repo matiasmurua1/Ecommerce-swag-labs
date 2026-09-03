@@ -1,0 +1,42 @@
+name: Cypress E2E Tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cypress-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cypress:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Run Cypress E2E tests
+        uses: cypress-io/github-action@v7
+        with:
+          browser: electron
+
+      - name: Upload Cypress evidence
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: cypress-evidence-${{ github.run_attempt }}
+          path: |
+            cypress/reports
+            cypress/screenshots
+          if-no-files-found: ignore
+          retention-days: 14
