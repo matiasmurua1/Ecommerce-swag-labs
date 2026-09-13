@@ -4,17 +4,15 @@ const createEsbuildPlugin = require('@badeball/cypress-cucumber-preprocessor/esb
 const createBundler = require('@bahmutov/cypress-esbuild-preprocessor');
 module.exports = defineConfig({
   e2e: {
-    specPattern: "cypress/features/**/*.feature",
+    baseUrl: 'https://www.saucedemo.com',
+    specPattern: 'cypress/features/**/*.feature',
     screenshotOnRunFailure: true,
     video: false,
-    reporter: 'json',
-    reporterOptions: {
-      reportDir: 'cypress/reports/json',
-      reportFilename: 'cucumber_report',
-      overwrite: true,
-      html: true,
-      embeddedScreenshots: true,
+    retries: {
+      runMode: 2,
+      openMode: 0,
     },
+    reporter: 'spec',
     async setupNodeEvents(on, config) {
       await addCucumberPreprocessorPlugin(on, config);
       
