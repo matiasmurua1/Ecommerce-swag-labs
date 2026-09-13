@@ -1,154 +1,185 @@
-# Introducción
+# Swag Labs - Automatización E2E con Cypress
 
-# Swag Labs - Automatización E2E
-Proyecto de automatización End-to-End del módulo de compras (Login y Shopping Cart) utilizando Cypress.
-Se implementa Page Object Model y estructura BDD con Cucumber.
+[![Cypress E2E Tests](https://github.com/matiasmurua1/Ecommerce-swag-labs/actions/workflows/cypress.yml/badge.svg)](https://github.com/matiasmurua1/Ecommerce-swag-labs/actions/workflows/cypress.yml)
 
-# Índice
+Proyecto de automatización de pruebas End-to-End sobre [Swag Labs](https://www.saucedemo.com/). La suite valida flujos críticos de autenticación, carrito de compras y checkout mediante Cypress, Cucumber y el patrón Page Object Model.
 
-- [Cómo Comenzar](#cómo-comenzar)
-- [Prerrequisitos](#prerrequisitos)
-- [Instalación de dependencias](#instalación-de-dependencias)
-- [Ejecución de tests](#ejecución-de-tests)
-- [Scripts relevantes del `package.json`](#scripts-relevantes-del-packagejson)
-- [Plugins recomendados](#plugins-recomendados)
-- [Estructura del proyecto](#estructura-del-proyecto)
-- [Spec pattern y preprocesador](#spec-pattern-y-preprocesador)
-- [Características](#características)
-- [Recursos útiles](#recursos-útiles)
-- [Decisiones técnicas](#decisiones-técnicas)
+El objetivo del repositorio es aplicar buenas prácticas de automatización y mantener una ejecución repetible tanto de forma local como en integración continua con GitHub Actions.
 
-# Cómo Comenzar
+## Tecnologías
 
-## Prerrequisitos
+- Cypress 15
+- JavaScript
+- Cucumber / Gherkin
+- `@badeball/cypress-cucumber-preprocessor`
+- esbuild
+- Page Object Model (POM)
+- GitHub Actions
 
-- Node.js v18+
-- npm v9+
-- Chrome instalado
-- Visual Studio Code (opcional)
+## Cobertura funcional
 
-## Instalación de dependencias
+La suite contiene 7 escenarios parametrizados que generan 10 ejecuciones de prueba.
 
-Clona el repositorio y desde la raíz del proyecto ejecuta:
+| Módulo | ID | Validación |
+| --- | --- | --- |
+| Login | TC-LOGIN-001 | Inicio de sesión exitoso con diferentes tipos de usuario |
+| Login | TC-LOGIN-002 | Mensaje de error para un usuario bloqueado |
+| Login | TC-LOGIN-003 | Mensaje de error con usuario o contraseña incorrectos |
+| Shopping Cart | TC-SHOPPING-001 | Compra exitosa de un producto |
+| Shopping Cart | TC-SHOPPING-002 | Compra exitosa de múltiples productos |
+| Shopping Cart | TC-SHOPPING-003 | Eliminación de un producto del carrito |
+| Checkout | TC-SHOPPING-006 | Validación de campos obligatorios vacíos |
+
+Los escenarios utilizan `Scenario Outline` y tablas `Examples` para ejecutar distintas combinaciones de datos sin duplicar pasos.
+
+## Estrategia de tags
+
+Los casos están agrupados por funcionalidad:
+
+- `@login`: escenarios de autenticación.
+- `@shoppingCart`: escenarios de carrito y checkout.
+
+Ejemplo de ejecución por tag:
 
 ```bash
-npm install
+npx cypress run --env tags="@login"
+npx cypress run --env tags="@shoppingCart"
 ```
-
-Esto instalará `cypress`, el preprocesador de Cucumber, herramientas de reporte y demás dependencias listadas en `package.json`.
-
-## Ejecución de tests
-
-Comandos principales disponibles (definidos en `package.json`):
-
-```bash
-npm run test         # ejecuta cypress en modo headless (cypress run)
-npm run test:open    # abre la UI de Cypress (cypress open)
-npm run test:report  # ejecuta pruebas y genera reporte HTML
-```
-
-### Scripts relevantes del `package.json`
-
-- `test`: ejecuta `cypress run` en modo headless.
-- `test:open`: ejecuta `cypress open` para interfaz interactiva.
-- `test:report`: ejecuta pruebas y genera un reporte HTML automático con Cucumber Reporter.
-
-## Plugins recomendados
-
-- Cucumber (Gherkin) Full Support: `alexkrechik.cucumberautocomplete`
-- Cypress Helper / Snippets: `shelex.vscode-cy-helper`, `andrew-codes.cypress-snippets`
-- ESLint: `dbaeumer.vscode-eslint`
-- Prettier: `esbenp.prettier-vscode`
-- GitLens: `eamodio.gitlens`
 
 ## Estructura del proyecto
 
-Carpetas principales relevantes:
-
-- `cypress/features/`: archivos `.feature` en Gherkin (tests en formato BDD).
-  - `front/`: pruebas de interfaz de usuario (login, carrito de compras).
-- `cypress/steps_definitions/`: definiciones de pasos (JS) mapeados al Gherkin.
-  - `front/`: implementación de steps para UI.
-- `cypress/pages/`: page objects (locators y helpers de UI).
-- `cypress/support/`: comandos personalizados y configuración compartida.
-- `jsonlogs/`: logs generados automáticamente en formato JSON y NDJSON.
-- `cypress.config.js`: configuración principal de Cypress.
-
-Estructura completa:
-
-```
+```text
 ecommerce-swag-labs/
+├── .github/
+│   └── workflows/
+│       └── cypress.yml                 # Pipeline de integración continua
 ├── cypress/
-│   ├── features/                         Casos de prueba en Gherkin
-│   │   ├── front/
-│   │   ├── login.feature            Escenarios de autenticación
-│   │   └── shoppingCart.feature     Escenarios de carrito y compra
-│   │   
-│   ├── pages/                            Page Object Model
-│   │   ├── loginPage.js                 Elementos y acciones de login
-│   │   ├── homePage.js                  Elementos y acciones de página principal
-│   │   ├── yourCartPage.js              Elementos y acciones del carrito
-│   │   ├── yourInformationPage.js       Elementos y acciones de información de usuario
-│   │   └── checkoutOverviewPage.js      Elementos y acciones del resumen de compra
-│   ├── steps_definitions/                Implementación de pasos del BDD
-│   │   ├── front/
-│   │   ├── common.js                Pasos comunes reutilizables
-│   │   └── shoppingCart.js          Pasos de flujo de compra
-│   │   
-│   │
-│   ├── support/                          Configuración y utilidades globales
-│   │   ├── commands.js                  Comandos personalizados de Cypress
-│   │   └── e2e.js                       Configuración inicial de pruebas
-│   ├── plugins/                          Plugins y generadores de reportes
-│   │   └── generateReport.js            Generador de reportes HTML
-│   └── screenshots/                      Screenshots capturados automáticamente
-│       └── front/
-├── jsonlogs/                             Logs automáticos
-│   ├── log.json                          Log en formato JSON
-│   └── messages.ndjson                  Log en formato NDJSON
-├── node_modules/                         Dependencias (ignorar en Git)
-├── cypress.config.js                     Configuración de Cypress
-├── .cypress-cucumber-preprocessorrc.json Configuración del preprocessor
-├── cucumber-report.html                  Reporte HTML generado
-├── package.json                          Dependencias y scripts
-├── package-lock.json                     Lock de versiones
-├── .gitignore                            Exclusiones de Git
-└── README.md                             Documentación del proyecto
+│   ├── features/
+│   │   └── front/
+│   │       ├── login.feature           # Escenarios de autenticación
+│   │       └── shoppingCart.feature    # Escenarios de carrito y checkout
+│   ├── pages/
+│   │   ├── checkoutOverviewPage.js
+│   │   ├── homePage.js
+│   │   ├── loginPage.js
+│   │   ├── yourCartPage.js
+│   │   └── yourInformationPage.js
+│   ├── plugins/
+│   │   └── generateReport.js
+│   ├── steps_definitions/
+│   │   └── front/
+│   │       ├── common.js               # Steps compartidos
+│   │       └── shoppingCart.js         # Steps de compra
+│   └── support/
+│       ├── commands.js
+│       └── e2e.js
+├── .cypress-cucumber-preprocessorrc.json
+├── cypress.config.js
+├── package.json
+└── README.md
 ```
 
-## Spec pattern y preprocesador
+## Decisiones de diseño
 
-La configuración de Cypress utiliza:
+### BDD con Cucumber
 
-- **specPattern**: `cypress/features/**/*.feature` para archivos Gherkin.
-- **Preprocesador**: `@badeball/cypress-cucumber-preprocessor` con `esbuild` para compilar features a código ejecutable.
-- **Archivo de configuración**: `cypress.config.js`.
+Los criterios de aceptación se expresan en Gherkin con pasos `Given`, `When` y `Then`. Esto permite separar la intención funcional de la implementación técnica y facilita la lectura de los casos.
 
-## Características
+### Page Object Model
 
-- **Pruebas BDD con Cucumber**: Escenarios legibles en Gherkin (Given/When/Then).
-- **Page Object Model**: Encapsulación de elementos y acciones de UI.
-- **Reportes HTML automáticos**: Generación de reportes visuales con Cucumber Reporter.
-- **Screenshots en fallos**: Captura automática de pantallas en errores.
-- **Logs estructurados**: Generación de logs JSON para auditoría y debugging.
-- **Validación de código**: ESLint para mantener code quality.
+Los selectores y acciones de cada pantalla se encapsulan en objetos de página. Las definiciones de pasos consumen estos objetos y concentran la lógica del flujo de negocio.
 
-# Recursos útiles
+### Parametrización
 
-- Cypress: https://docs.cypress.io
-- Cucumber / Gherkin: https://cucumber.io/docs/gherkin/reference/
-- Cypress Cucumber Preprocessor: https://github.com/badeball/cypress-cucumber-preprocessor
-- Multiple Cucumber HTML Reporter: https://github.com/volumes/multiple-cucumber-html-reporter
+Los `Scenario Outline` utilizan tablas `Examples` para ampliar la cobertura con diferentes usuarios, credenciales, productos y datos de checkout.
 
-# Decisiones técnicas
+### Evidencias
 
-- **Uso de POM (Page Object Model)**: Facilita el mantenimiento del código y reutilización de locators.
-- **Ejemplos en features**: Uso de `Examples` para parametrizar escenarios y validar múltiples usuarios en un mismo flujo.
-- **Parametrización de steps**: Steps reutilizables y genéricos para facilitar composición de escenarios complejos.
-- **Logs y Reportes**: Generación automática de logs y reportes para trazabilidad y análisis de fallos.
+La configuración genera automáticamente:
 
-AUTOR: MURUA MARTINEZ MATIAS NAHUEL  
-Email: murua.matias.96@gmail.com  
-Versión: 1.0.0 - Mayo 2026
+- Reporte JSON: `cypress/reports/json/cucumber-report.json`.
+- Mensajes Cucumber: `cypress/reports/messages/messages.ndjson`.
+- Reporte HTML: `cypress/reports/html/cucumber-report.html`.
+- Screenshots cuando una prueba falla.
 
+Los reportes, screenshots y demás archivos generados se excluyen del control de versiones.
 
+## Prerrequisitos
+
+- Node.js 22 recomendado, para mantener paridad con el pipeline de CI.
+- npm.
+- Git.
+
+Cypress incluye Electron, por lo que Chrome no es obligatorio para la ejecución predeterminada.
+
+## Instalación
+
+Clonar el repositorio e instalar las dependencias desde la raíz:
+
+```bash
+git clone https://github.com/matiasmurua1/Ecommerce-swag-labs.git
+cd Ecommerce-swag-labs
+npm ci
+```
+
+## Ejecución de pruebas
+
+```bash
+# Suite completa en modo headless
+npm test
+
+# Suite completa en Electron, igual que en CI
+npm run test:ci
+
+# Interfaz interactiva de Cypress
+npm run test:open
+
+# Ejecución con generación de reportes Cucumber
+npm run test:report
+```
+
+## Configuración principal
+
+La configuración de Cypress define:
+
+- URL base: `https://www.saucedemo.com`.
+- Features: `cypress/features/**/*.feature`.
+- Screenshots automáticos ante fallos.
+- Dos reintentos en modo headless y ninguno en modo interactivo.
+- Ejecución sin video.
+- Preprocesamiento de Gherkin mediante Cucumber y esbuild.
+
+## Integración continua
+
+El workflow `Cypress E2E Tests` se ejecuta automáticamente con cada `push` y `pull_request`.
+
+El pipeline:
+
+1. Descarga el repositorio.
+2. Configura Node.js 22 sobre Ubuntu 24.04.
+3. Instala las dependencias y ejecuta Cypress en Electron.
+4. Publica reportes y screenshots como artefactos, incluso cuando falla una prueba.
+
+Las evidencias se conservan durante 14 días. Además, las ejecuciones anteriores de la misma rama se cancelan cuando un cambio más reciente inicia un nuevo pipeline.
+
+## Roadmap
+
+- Seleccionar productos dinámicamente a partir del nombre recibido por el escenario.
+- Incorporar suites `@smoke` y `@regression`.
+- Agregar validación estática con ESLint al pipeline.
+- Ampliar la cobertura con pruebas de API.
+- Evaluar una matriz de ejecución cross-browser.
+- Analizar y reducir posibles pruebas inestables antes de depender de reintentos.
+
+## Recursos
+
+- [Documentación de Cypress](https://docs.cypress.io/)
+- [Referencia de Gherkin](https://cucumber.io/docs/gherkin/reference/)
+- [Cypress Cucumber Preprocessor](https://github.com/badeball/cypress-cucumber-preprocessor)
+- [Cypress GitHub Action](https://github.com/cypress-io/github-action)
+
+## Autor
+
+**Matías Nahuel Murua Martínez**
+
+Email: murua.matias.96@gmail.com

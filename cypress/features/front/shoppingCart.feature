@@ -1,7 +1,7 @@
 Feature: Validación funcionalidad del carrito de compras en Swag Labs
 
-  @PASS
-  Scenario:TC-SHOPPING-001 realizar una compra exitosa de un producto
+  @shoppingCart
+  Scenario Outline: Scenario Outline name:TC-SHOPPING-001 realizar una compra exitosa de un producto
     Given que estoy en la pagina de login de Swag Labs
     When ingreso el username "<userName>" y password "<password>"
     Then deberia iniciar sesion exitosamente y ser redirigido a la pagina de inicio de Swag Labs
@@ -13,8 +13,8 @@ Feature: Validación funcionalidad del carrito de compras en Swag Labs
       | userName       | password       | productName         | name    | lastName  | postalCode |
       | standard_user  | secret_sauce   | Sauce Labs Backpack | Matias  | Murua     | 500        |
 
-  @PASS
-  Scenario:TC-SHOPPING-002 realizar una compra exitosa de multiples productos
+  @shoppingCart
+  Scenario Outline: Scenario Outline name:TC-SHOPPING-002 realizar una compra exitosa de multiples productos
     Given que estoy en la pagina de login de Swag Labs
     When ingreso el username "<userName>" y password "<password>"
     Then deberia iniciar sesion exitosamente y ser redirigido a la pagina de inicio de Swag Labs
@@ -26,8 +26,8 @@ Feature: Validación funcionalidad del carrito de compras en Swag Labs
       | userName      | password      | productName1        | productName2            | productName3       | name    | lastName  | postalCode |
       | standard_user | secret_sauce  | Sauce Labs Backpack | Sauce Labs Bolt T-Shirt |Sauce Labs Onesie   | Matias  | Murua     | 500        |
 
-  @PASS
-  Scenario:TC-SHOPPING-003 Eliminar un producto del carrito de compras
+  @shoppingCart
+  Scenario Outline: Scenario Outline name:TC-SHOPPING-003 Eliminar un producto del carrito de compras
     Given que estoy en la pagina de login de Swag Labs
     When ingreso el username "<userName>" y password "<password>"
     Then deberia iniciar sesion exitosamente y ser redirigido a la pagina de inicio de Swag Labs
@@ -39,8 +39,8 @@ Feature: Validación funcionalidad del carrito de compras en Swag Labs
       | userName       | password       | productName          |
       | standard_user  | secret_sauce   | Sauce Labs Backpack  |
   
-  @PASS
-  Scenario:TC-SHOPPING-006 Checkout con campos obligatorios vacíos
+  @shoppingCart
+  Scenario Outline: Scenario Outline name:TC-SHOPPING-006 Checkout con campos obligatorios vacíos
     Given que estoy en la pagina de login de Swag Labs
     When ingreso el username "<userName>" y password "<password>"
     Then deberia iniciar sesion exitosamente y ser redirigido a la pagina de inicio de Swag Labs
